@@ -14,7 +14,7 @@
 
     <script>
         function fetchClosePrice() {
-            var ticker = document.getElementById("tickerInput").value;
+            var ticker = document.getElementById("tickerInput").value.toUpperCase(); // Convert text to uppercase
             var apiKey = 'cdL83nFF2luLQJJFd0PeQzVgpvFwdays';
 
             // Make a GET request to fetch the previous day's close price
