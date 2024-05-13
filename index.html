@@ -1,7 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Charts</title>
+    <style>
+        #chart-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .chart {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+    <div>
+        <input type="text" id="tickerInput" placeholder="Enter Stock Ticker">
+        <button onclick="addChart()">Add Chart</button>
+    </div>
+    <div id="chart-container"></div>
+
+    <script>
+        function addChart() {
+            const tickerInput = document.getElementById('tickerInput').value;
+            if (tickerInput.trim() === '') {
+                alert('Please enter a valid stock ticker.');
+                return;
+            }
+
+            const chartContainer = document.getElementById('chart-container');
+            const chartDiv = document.createElement('div');
+            chartDiv.classList.add('chart');
+            chartDiv.innerHTML = `<img src="https://example.com/chart?ticker=${tickerInput}" alt="Stock Chart for ${tickerInput}">`;
+            chartContainer.appendChild(chartDiv);
+
+            document.getElementById('tickerInput').value = ''; // Clear input after adding chart
+        }
+    </script>
 </body>
 </html>
