@@ -3,51 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Charts</title>
-    <style>
-        #chart-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .chart {
-            border: 1px solid #ccc;
-            padding: 10px;
-        }
-    </style>
+    <title>Stock Ticker Close Price</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-    <div>
-        <input type="text" id="tickerInput" placeholder="Enter Stock Ticker">
-        <button onclick="addChart()">Add Chart</button>
-    </div>
-    <div id="chart-container"></div>
+    <h1>Stock Ticker Close Price</h1>
+    <input type="text" id="tickerInput" placeholder="Enter Stock Ticker">
+    <button onclick="fetchClosePrice()">Get Close Price</button>
+    <p id="closePrice"></p>
 
     <script>
-        async function addChart() {
-            const tickerInput = document.getElementById('tickerInput').value.trim();
-            if (tickerInput === '') {
-                alert('Please enter a valid stock ticker.');
-                return;
-            }
+        function fetchClosePrice() {
+            var ticker = document.getElementById("tickerInput").value;
+            var apiKey = 'cdL83nFF2luLQJJFd0PeQzVgpvFwdays';
 
-            try {
-                const response = await fetch(`https://api.polygon.io/v1/meta/symbols/${tickerInput}/chart?apiKey=cdL83nFF2luLQJJFd0PeQzVgpvFwdays`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch chart data');
+            // Make a GET request to fetch the previous day's close price
+            $.get('https://api.polygon.io/v2/aggs/ticker/' + ticker + '/prev?unadjusted=true&apiKey=' + apiKey, function(data) {
+                if (data.status == 'OK') {
+                    var closePrice = data.results[0].c;
+                    document.getElementById("closePrice").innerText = "Previous day's close price for " + ticker + ": $" + closePrice.toFixed(2);
+                } else {
+                    document.getElementById("closePrice").innerText = "Error fetching data. Please check the ticker symbol.";
                 }
-                const data = await response.json();
-                const chartContainer = document.getElementById('chart-container');
-                const chartDiv = document.createElement('div');
-                chartDiv.classList.add('chart');
-                chartDiv.innerHTML = `<img src="${data.url}" alt="Stock Chart for ${tickerInput}">`;
-                chartContainer.appendChild(chartDiv);
-            } catch (error) {
-                console.error(error);
-                alert('Failed to fetch chart data. Please try again later.');
-            }
-
-            document.getElementById('tickerInput').value = ''; // Clear input after adding chart
+            });
         }
     </script>
 </body>
