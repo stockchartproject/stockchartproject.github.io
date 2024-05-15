@@ -3,30 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Ticker Close Price</title>
+    <title>Stock Ticker Chart</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-    <h1>Stock Ticker Close Price</h1>
+    <h1>Stock Ticker Chart</h1>
     <input type="text" id="tickerInput" placeholder="Enter Stock Ticker">
-    <button onclick="fetchClosePrice()">Get Close Price</button>
-    <p id="closePrice"></p>
+    <button onclick="fetchStockChart()">Get Chart</button>
+    <div id="chartContainer"></div>
 
     <script>
-        function fetchClosePrice() {
+        function fetchStockChart() {
             var ticker = document.getElementById("tickerInput").value.toUpperCase(); // Convert text to uppercase
-            var apiKey = 'cdL83nFF2luLQJJFd0PeQzVgpvFwdays';
+            var apiKey = 'cdL83nFF2luLQJJFd0PeQzVgpvFwdays'; // Your Polygon.io API key
 
-            // Make a GET request to fetch the previous day's close price
-            $.get('https://api.polygon.io/v2/aggs/ticker/' + ticker + '/prev?unadjusted=true&apiKey=' + apiKey, function(data) {
+            // Make a GET request to fetch the stock chart
+            $.get('https://api.polygon.io/v2/aggs/ticker/' + ticker + '/range/1/day/prev?apiKey=' + apiKey, function(data) {
                 if (data.status == 'OK') {
-                    var closePrice = data.results[0].c;
-                    document.getElementById("closePrice").innerText = "Previous day's close price for " + ticker + ": $" + closePrice.toFixed(2);
+                    var stockData = data.results;
+                    var dates = [];
+                    var prices = [];
+
+                    for (var i = 0; i < stockData.length; i++) {
+                        dates.push(new Date(stockData[i].t));
+                        prices.push(stockData[i].c);
+                    }
+
+                    // Display the stock chart using any charting library of your choice
+                    // Here, we use a simple example with Google Charts
+                    google.charts.load('current', {'packages':['corechart']});
+                    google.charts.setOnLoadCallback(drawChart);
+
+                    function drawChart() {
+                        var data = new google.visualization.DataTable();
+                        data.addColumn('date', 'Date');
+                        data.addColumn('number', 'Price');
+
+                        for (var i = 0; i < dates.length; i++) {
+                            data.addRow([dates[i], prices[i]]);
+                        }
+
+                        var options = {
+                            title: 'Stock Price Chart for ' + ticker,
+                            curveType: 'function',
+                            legend: { position: 'bottom' }
+                        };
+
+                        var chart = new google.visualization.LineChart(document.getElementById('chartContainer'));
+                        chart.draw(data, options);
+                    }
                 } else {
-                    document.getElementById("closePrice").innerText = "Error fetching data. Please check the ticker symbol.";
+                    alert("Error fetching data. Please check the ticker symbol.");
                 }
             });
         }
     </script>
+
+    <!-- Google Charts API -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </body>
 </html>
